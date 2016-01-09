@@ -1,0 +1,15 @@
+{
+  "parser": "babel-eslint",
+  "rules": {
+    "strict": 0,
+    "indent": 2,
+    "quotes": [2, "double"],
+    "no-underscore-dangle": 0
+  },
+  "env": {
+    "node": true,
+    "jasmine": true,
+    "amd": true,
+    "es6": true
+  }
+}

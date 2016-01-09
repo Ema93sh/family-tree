@@ -1,0 +1,29 @@
+.node {
+  fill: #ccc;
+  stroke: #fff;
+  stroke-width: 2px;
+}
+.link {
+  stroke: #777;
+}
+.child-link {
+  stroke: #99FF66;
+}
+.spouse-link {
+  stroke: #FF0000;
+}
+
+circle.female {
+  fill: #FF00FF;
+}
+circle.male {
+  fill: #0174DF;
+}
+circle.highlight {
+  fill: #DF013A;
+}
+
+circle:hover {
+  fill: #088A29;
+  opacity: 0.9;
+}
