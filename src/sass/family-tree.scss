@@ -13,17 +13,27 @@
   stroke: #FF0000;
 }
 
-circle.female {
-  fill: #FF00FF;
-}
-circle.male {
-  fill: #0174DF;
-}
-circle.highlight {
-  fill: #DF013A;
+circle {
+  stroke: #777;
 }
 
-circle:hover {
-  fill: #088A29;
-  opacity: 0.9;
+circle.female {
+  fill: url(#female-image);
+}
+
+circle.female.highlight {
+  fill: url(#highlight-female-image);
+}
+
+circle.male.highlight {
+  fill: url(#highlight-male-image);
+}
+
+circle.male {
+  fill: url(#male-image);
+}
+
+circle.highlight {
+  stroke: #DF013A;
+  stroke-width: 2px;
 }

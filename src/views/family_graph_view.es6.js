@@ -1,5 +1,4 @@
 import d3 from "d3";
-import d3tip from "d3-tip";
 import ContextMenu from "./context_menu.es6.js";
 import {Spouse, Child, Male} from "../models/symbols.es6.js";
 
@@ -20,6 +19,59 @@ class FamilyGraphView {
                 .attr("height", this.height);
         }
         this.svg.selectAll("*").remove();
+        this.createSvgPatterns();
+    }
+
+    createSvgPatterns() {
+        this.defs = this.svg.append("svg:defs");
+        this.defs.append("svg:pattern")
+               .attr("id", "female-image")
+               .attr("width", "40")
+               .attr("height", "40")
+               .attr("x", "0")
+               .attr("y", "0")
+               .append("svg:image")
+               .attr("width", "40")
+               .attr("height", "40")
+               .attr("x", "0")
+               .attr("y", "0")
+               .attr("xlink:href", "images/queen.jpg");
+        this.defs.append("svg:pattern")
+              .attr("id", "male-image")
+              .attr("width", "40")
+              .attr("height", "40")
+              .attr("x", "0")
+              .attr("y", "0")
+              .append("svg:image")
+              .attr("width", "40")
+              .attr("height", "40")
+              .attr("x", "0")
+              .attr("y", "0")
+              .attr("xlink:href", "images/king.jpg");
+        this.defs.append("svg:pattern")
+              .attr("id", "highlight-male-image")
+              .attr("width", "60")
+              .attr("height", "60")
+              .attr("x", "0")
+              .attr("y", "0")
+              .append("svg:image")
+              .attr("width", "60")
+              .attr("height", "60")
+              .attr("x", "0")
+              .attr("y", "0")
+              .attr("xlink:href", "images/king.jpg");
+        this.defs.append("svg:pattern")
+              .attr("id", "highlight-female-image")
+              .attr("width", "60")
+              .attr("height", "60")
+              .attr("x", "0")
+              .attr("y", "0")
+              .append("svg:image")
+              .attr("width", "60")
+              .attr("height", "60")
+              .attr("x", "0")
+              .attr("y", "0")
+              .attr("xlink:href", "images/queen.jpg");
     }
 
 
@@ -161,16 +213,6 @@ class FamilyGraphView {
         this.generateMenuItems(controller);
 
         let layout = d3.layout.force();
-        let fill = d3.scale.category20();
-        let tip = d3tip(d3);
-        let tooltip = tip()
-            .attr("class", "d3-tip")
-            .offset([-8, 0])
-            .html(function(d) {
-                return d.name;
-            });
-        this.svg.call(tooltip);
-
         let link = this.svg.selectAll("line")
             .data(links)
             .enter()
@@ -185,28 +227,46 @@ class FamilyGraphView {
                 }
             });
 
-        let node = this.svg.selectAll("circle")
+        let nodeEnter = this.svg.selectAll("circle")
             .data(nodes)
-            .enter().append("svg:circle")
-            .attr("r", 20 - .75)
-            .attr("class", (d) => {
-                if (d.highlight) {
-                    return "highlight";
-                }
-                else if (d.sex === Male) {
-                    return "male";
+            .enter()
+            .append("g");
+
+        nodeEnter.append("svg:circle")
+            .attr("r", (d) => {
+                if(d.highlight) {
+                    return 30 - 0.75;
                 }
                 else {
-                    return "female";
+                    return 20 - 0.75;
                 }
             })
-            .style("stroke", function(d) {
-                return d3.rgb(fill(d.group)).darker();
+            .attr("class", (d) => {
+                let classes = [];
+                if (d.highlight) {
+                    classes.push("highlight");
+                }
+                if (d.sex === Male) {
+                    classes.push("male");
+                }
+                else {
+                    classes.push("female");
+                }
+                return classes.join(" ");
             })
-            .on("mouseover", tooltip.show)
-            .on("mouseout", tooltip.hide)
             .on("contextmenu", this.menu.generate())
             .call(layout.drag);
+
+        nodeEnter.append("text")
+                 .attr("dy", (d) => {
+                     if(d.highlight) {
+                         return -35;
+                     }
+                     else {
+                         return -25;
+                     }
+                 })
+                 .text((d) => { return d.name; });
 
         layout.charge(-600);
         layout.linkDistance((d) => {
@@ -220,8 +280,7 @@ class FamilyGraphView {
         layout.links(links);
 
         layout.on("tick", () => {
-            node.attr("cx", (d) => { return d.x; });
-            node.attr("cy", (d) => { return d.y; });
+            nodeEnter.attr("transform", (d) => { return "translate(" + d.x + "," + d.y + ")"; });
 
             link.attr("x1", (d) => { return d.source.x; });
             link.attr("y1", (d) => { return d.source.y; });
