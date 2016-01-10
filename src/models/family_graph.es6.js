@@ -1,5 +1,6 @@
 import Graph from "./graph.es6.js";
-import {Husband, Wife, Parent, Child, Male, Female} from "./symbols.es6.js";
+import {Spouse, Parent, Child, Male, Female} from "./symbols.es6.js";
+import _ from "lodash";
 
 function isMalePredicate (person){
     return person.sex === Male;
@@ -24,8 +25,8 @@ class FamilyGraph extends Graph {
 
     marry(husband, wife) {
         this.addNodes([husband, wife]);
-        this.addEdge(husband, wife, Wife);
-        this.addEdge(wife, husband, Husband);
+        this.addEdge(husband, wife, Spouse);
+        this.addEdge(wife, husband, Spouse);
     }
 
     addChild(husband, wife, child) {
@@ -43,12 +44,22 @@ class FamilyGraph extends Graph {
         }
     }
 
+    addHuman(newHuman, withHuman, relationship) {
+        if(relationship === Child) {
+            let spouse = _.head(this.getNodesWithLinkChain(withHuman, [Spouse]));
+            this.addChild(withHuman, spouse, newHuman);
+        }
+        else if(relationship === Spouse) {
+            this.marry(newHuman, withHuman);
+        }
+    }
+
     wifes(human) {
-        return this.getNodesWithLinkChain(human, [Wife]);
+        return this.getNodesWithLinkChain(human, [Spouse, isFemalePredicate]);
     }
 
     husbands(human) {
-        return this.getNodesWithLinkChain(human, [Husband]);
+        return this.getNodesWithLinkChain(human, [Spouse, isMalePredicate]);
     }
 
     siblings(human) {

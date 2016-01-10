@@ -1,12 +1,21 @@
+/*global document*/
 import {Male, Female} from "../models/symbols.es6.js";
 import Person from "../models/person.es6.js";
 import _ from "lodash";
+import Modal from "react-overlays/lib/Modal";
+import AddHumanView from "../views/add_human_view.es6.js";
+import React from "react";
+import ReactDOM from "react-dom";
 
 class FamilyController {
 
     constructor(familyGraph, familyGraphView) {
         this.familyGraph = familyGraph;
         this.familyGraphView = familyGraphView;
+        this.addHumanModal = {
+          human: undefined,
+          withHuman: undefined
+        };
     }
 
     generateSampleData() {
@@ -54,6 +63,19 @@ class FamilyController {
         this.renderView();
     }
 
+    onAddHuman(newHuman, withHuman, relationship) {
+        this.familyGraph.addHuman(newHuman, withHuman, relationship);
+        this.clearAllHighlights();
+        this.renderView();
+    }
+
+    renderAddHumanView(human, relationship) {
+        let addHumanView = ReactDOM.render(
+          <AddHumanView withHuman={human} relationship={relationship} onAdd={this.onAddHuman.bind(this)}></AddHumanView>,
+          document.getElementById("app")
+        );
+        addHumanView.setState({showModal: true, name: "", sex: ""});
+    }
 
     renderView() {
         this.familyGraphView.render(this);

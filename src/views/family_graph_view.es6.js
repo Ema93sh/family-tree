@@ -1,10 +1,7 @@
 import d3 from "d3";
 import d3tip from "d3-tip";
 import ContextMenu from "./context_menu.es6.js";
-import {
-    Husband, Wife, Child, Male
-}
-from "../models/symbols.es6.js";
+import {Spouse, Child, Male} from "../models/symbols.es6.js";
 
 class FamilyGraphView {
 
@@ -25,93 +22,137 @@ class FamilyGraphView {
         this.svg.selectAll("*").remove();
     }
 
+
     generateMenuItems(controller) {
         var self = this;
-        self.menu.clearAll();
-
-        self.menu.addMenuItem({
+        this.menu.clearAll();
+        this.menu.addMenuItems([{
             title: "Wifes",
+            group: "Find",
             action: (element, data) => {
                 controller.highlightFor("wifes", data);
+            },
+            canShow: (human) => {
+                return self.family.wifes(human).length > 0;
             }
-        });
-
-        self.menu.addMenuItem({
+          }, {
             title: "Husbands",
+            group: "Find",
             action: (element, data) => {
                 controller.highlightFor("husbands", data);
+            },
+            canShow: (human) => {
+                return self.family.husbands(human).length > 0;
             }
-        });
-
-        self.menu.addMenuItem({
+        }, {
             title: "Siblings",
+            group: "Find",
             action: (element, data) => {
                 controller.highlightFor("siblings", data);
+            },
+            canShow: (human) => {
+                return self.family.siblings(human).length > 0;
             }
-        });
-
-        self.menu.addMenuItem({
+        }, {
           title: "Brothers",
+          group: "Find",
           action: (element, data) => {
               controller.highlightFor("brothers", data);
+          },
+          canShow: (human) => {
+              return self.family.brothers(human).length > 0;
           }
-        });
-
-        self.menu.addMenuItem({
+        }, {
             title: "Sisters",
+            group: "Find",
             action: (element, data) => {
                 controller.highlightFor("sisters", data);
+            },
+            canShow: (human) => {
+                return self.family.sisters(human).length > 0;
             }
-        });
-
-        self.menu.addMenuItem({
+        }, {
           title: "Parents",
+          group: "Find",
           action: (element, data) => {
               controller.highlightFor("parents", data);
+          },
+          canShow: (human) => {
+              return self.family.parents(human).length > 0;
           }
-        });
-
-        self.menu.addMenuItem({
+        }, {
           title: "Sons",
+          group: "Find",
           action: (element, data) => {
               controller.highlightFor("sons", data);
+          },
+          canShow: (human) => {
+              return self.family.sons(human).length > 0;
           }
-        });
-
-        self.menu.addMenuItem({
+        }, {
           title: "Daughters",
+          group: "Find",
           action: (element, data) => {
               controller.highlightFor("daughters", data);
+          },
+          canShow: (human) => {
+              return self.family.daughters(human).length > 0;
           }
-        });
-
-        self.menu.addMenuItem({
+        }, {
           title: "Children",
+          group: "Find",
           action: (element, data) => {
               controller.highlightFor("children", data);
+          },
+          canShow: (human) => {
+              return human.hasChildren();
           }
-        });
-
-        self.menu.addMenuItem({
+        }, {
           title: "Granddaughters",
+          group: "Find",
           action: (element, data) => {
               controller.highlightFor("grandDaughters", data);
+          },
+          canShow: (human) => {
+              return self.family.grandDaughters(human).length > 0;
           }
-        });
-
-        self.menu.addMenuItem({
+        }, {
           title: "Grandsons",
+          group: "Find",
           action: (element, data) => {
               controller.highlightFor("grandSons", data);
+          },
+          canShow: (human) => {
+              return self.family.grandSons(human).length > 0;
           }
-        });
-
-        self.menu.addMenuItem({
+        }, {
           title: "Grandchildren",
+          group: "Find",
           action: (element, data) => {
               controller.highlightFor("grandChildren", data);
+          },
+          canShow: (human) => {
+              return self.family.grandChildren(human).length > 0;
           }
-        });
+        }, {
+          title: "Child",
+          group: "Add",
+          action: (element, data) => {
+              controller.renderAddHumanView(data, Child);
+          },
+          canShow: (human) => {
+              return human.isMarried();
+          }
+        }, {
+          title: "Spouse",
+          group: "Add",
+          action: (element, data) => {
+              controller.renderAddHumanView(data, Spouse);
+          },
+          canShow: (human) => {
+              return !human.isMarried();
+          }
+        }]);
     }
 
     render(controller) {
@@ -136,7 +177,7 @@ class FamilyGraphView {
             .append("svg:line")
             .attr("class", "link")
             .attr("class", (d) => {
-                if (d.type === Wife || d.type === Husband) {
+                if (d.type === Spouse) {
                     return "spouse-link";
                 }
                 else if (d.type === Child) {
@@ -169,7 +210,7 @@ class FamilyGraphView {
 
         layout.charge(-600);
         layout.linkDistance((d) => {
-            if (d.type === Husband || d.type === Wife) {
+            if (d.type === Spouse) {
                 return 50;
             }
             return 90;
